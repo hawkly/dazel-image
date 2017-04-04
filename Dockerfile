@@ -1,4 +1,5 @@
 FROM ubuntu:17.04
+MAINTAINER Nadir Izrael nadir.izr@gmail.com
 
 # Update system and install prerequisites
 RUN apt-get update -y && \
@@ -27,14 +28,18 @@ RUN update-ca-certificates -f
 
 
 
-# Add Docker APT source
-RUN echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list && \
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9 && \
-    apt-get update -y && \
-    apt-get install -y lxc-docker python python-dev python-pip python-virtualenv git && \
+ENV DOCKER_BUCKET get.docker.com
+ENV DOCKER_VERSION 1.13.1
+ENV DOCKER_SHA256 97892375e756fd29a304bd8cd9ffb256c2e7c8fd759e12a55a6336e15100ad75
+
+
+RUN apt-get update -y && \
+    apt-get install -y python python-dev python-pip python-virtualenv git curl wget && \
     apt-get clean \
   && \
   rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://get.docker.com/ | sh
 
 RUN echo 'DOCKER_OPTS="-H :2375 unix:///var/run/docker.sock"' >> /etc/default/docker
 
